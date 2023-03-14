@@ -16,11 +16,22 @@ class TDAMMModel:
         return self.fluxDensity(t, nu, **kwargs)
 
     def parseArgs(self, **kwargs):
+
         pars = self.getParameters()
+
+        Z = {}
+        for par in pars:
+            if par.name not in kwargs:
+                raise RuntimeError("Parameter {0:s} not given to model"
+                                    .format(par.name))
+            Z[par.name] = kwargs[par.name]
+
+        return Z
+
 
 class ModelParameter:
 
-    def __init__(self, name, name_tex, unit, low, high):
+    def __init__(self, name, name_tex, unit_name, low, high):
         self.name = name
         self.name_tex = name_tex
         self.unit_name = unit_name
