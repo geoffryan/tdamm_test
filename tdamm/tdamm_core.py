@@ -6,11 +6,26 @@ class TDAMMModel:
     def __init__(self):
         pass
 
-    def fluxDensity(self, t, nu, *args, **kwargs):
+    def fluxDensity(self, t, nu, **kwargs):
         pass
 
-    def __call__(self, t, nu, *args, **kwargs):
-        return self.fluxDensity(t, nu, *args, **kwargs)
+    def getParameters(self):
+        pass
+
+    def __call__(self, t, nu, **kwargs):
+        return self.fluxDensity(t, nu, **kwargs)
+
+    def parseArgs(self, **kwargs):
+        pars = self.getParameters()
+
+class ModelParameter:
+
+    def __init__(self, name, name_tex, unit, low, high):
+        self.name = name
+        self.name_tex = name_tex
+        self.unit_name = unit_name
+        self.low = low
+        self.high = high
 
 
 class Dummy(TDAMMModel):
