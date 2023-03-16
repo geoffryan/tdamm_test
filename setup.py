@@ -1,5 +1,6 @@
 from setuptools import setup
 
 setup(
-        name='tdamm'
+        name='tdamm',
+        packages=['tdamm']
     )
