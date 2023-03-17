@@ -30,6 +30,7 @@ def run(filenames, output_filename, Nθ_new, Nλ_new):
         λe_new = np.empty((Nλ_new, 2), dtype=np.float32)
         θe_new = np.empty((Nθ_new, 2), dtype=np.float32)
         fλ_new = np.zeros((Nt, Nλ_new, Nθ_new), dtype=np.float32)
+        Lλ_new = np.zeros((Nt, Nλ_new, Nθ_new), dtype=np.float32)
 
         λe_new[:, 0] = λe[idx_λ[:-1], 0]
         λe_new[:, 1] = λe[idx_λ[1:]-1, 1]
@@ -53,7 +54,7 @@ def run(filenames, output_filename, Nθ_new, Nλ_new):
                         ).sum(axis=(1, 2)) / (
                             dλ_new[i] * dΩ_new[j])
 
-        Lλ_new = 4*np.pi * dL**2 * fλ_new
+        Lλ_new[:, :, :] = 4*np.pi * dL**2 * fλ_new[:, :, :]
 
         output_name = output_dir / (filename.stem + ".reduced.h5")
 
