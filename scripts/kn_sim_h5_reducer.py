@@ -10,7 +10,7 @@ def run(filenames, output_filename, Nθ_new, Nλ_new):
     dL = (10 * units.pc).cgs
 
     for filename in filenames:
-        with h5.File(filenames[0], "r") as f:
+        with h5.File(filename, "r") as f:
             fλ = f['fla_cgs_per_angstrom'][...]
             t = f['t_days'][...]
             λe = f['lambda_cm'][...]
