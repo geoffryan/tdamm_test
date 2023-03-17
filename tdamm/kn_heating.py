@@ -78,8 +78,7 @@ class KilonovaHeatingRateModel(TDAMMModel):
             #keep=ts>0.02*u.d
             #ts=ts[keep]
             nus=freqs*self.zp1
-            if len(nus.shape)>0:nus=nus[keep]
-            else: nus=nus*np.ones(len(ts))
+            if len(nus.shape)==0: nus=nus*np.ones(len(ts))
             #print('ts',ts)
             #print('nus',nus)
             (L, T, r) = lightcurve(ts, self.mass, self.velocities, self.opacities, self.n)
