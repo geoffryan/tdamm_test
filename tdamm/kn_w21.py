@@ -39,7 +39,11 @@ class KN_W21(TDAMMModel):
         dL = pars['d_L'].to('cm')
         thetaObs = pars['thetaObs'].to_value('rad')
 
-        theta_idx = np.searchsorted(self.theta_bins, thetaObs)
+        theta_idx = np.searchsorted(self.theta_bins, thetaObs) - 1
+        if theta_idx < 0:
+            theta_idx = 0
+        if theta_idx >= self.theta_bins.shape[0]-1:
+            theta_idx = self.theta_bins.shape[0]-2
 
         t = t_obs.to_value('s') / (1+z)
         nu = nu_obs.to_value('Hz') * (1+z)
