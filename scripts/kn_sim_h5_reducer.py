@@ -7,6 +7,8 @@ from astropy import constants
 
 def run(filenames, output_filename, Nθ_new, Nλ_new):
 
+    dL = (10 * units.pc).cgs
+
     for filename in filenames:
         with h5.File(filenames[0], "r") as f:
             fλ = f['fla_cgs_per_angstrom'][...]
@@ -51,6 +53,8 @@ def run(filenames, output_filename, Nθ_new, Nλ_new):
                         ).sum(axis=(1, 2)) / (
                             dλ_new[i] * dΩ_new[j])
 
+        Lλ_new = 4*np.pi * dL**2 * fλ_new
+
         output_name = output_dir / (filename.stem + ".reduced.h5")
 
         print("Saving", output_name)
@@ -59,7 +63,7 @@ def run(filenames, output_filename, Nθ_new, Nλ_new):
             f.create_dataset('t_days', data=t)
             f.create_dataset('lambda_cm', data=λe_new)
             f.create_dataset('theta_rad', data=θe_new)
-            f.create_dataset('fla_cgs_per_angstrom', data=fλ_new)
+            f.create_dataset('Lla_erg_per_s_angstrom', data=Lλ_new)
 
             f.create_dataset('md_Msolar', data=md)
             f.create_dataset('mw_Msolar', data=mw)
