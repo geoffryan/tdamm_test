@@ -64,7 +64,7 @@ def run(filenames, output_filename, Nθ_new, Nλ_new):
             f.create_dataset('t_days', data=t)
             f.create_dataset('lambda_cm', data=λe_new)
             f.create_dataset('theta_rad', data=θe_new)
-            f.create_dataset('Lla_erg_per_s_angstrom', data=Lλ_new)
+            f.create_dataset('Llambda_erg_per_s_angstrom', data=Lλ_new)
 
             f.create_dataset('md_Msolar', data=md)
             f.create_dataset('mw_Msolar', data=mw)
