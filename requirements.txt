@@ -2,3 +2,4 @@ numpy
 h5py
 astropy
 afterglowpy
+kilonova-heating-rate
