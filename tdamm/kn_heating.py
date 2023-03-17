@@ -1,41 +1,26 @@
-
+import numpy as np
 from .tdamm_core import TDAMMModel
-import afterglowpy as grb
-
+#import synphot
 
 #!/usr/bin/env python
-import timeit
 
 from astropy import constants as c
 from astropy import units as u
 from kilonova_heating_rate import lightcurve
 
 
-mass = 0.05 * u.Msun
-velocities = np.asarray([0.1, 0.2, 0.4]) * c.c
-opacities = np.asarray([3.0, 0.5]) * u.cm**2 / u.g
-n = 4.5
-t = np.geomspace(0.02, 10) * u.day
-
-L, T, r = lightcurve(t, mass, velocities, opacities, n)
-
-# Evaluate flux in band at 100 Mpc for a few different filters.
-DL = 100 * u.Mpc
-seds = [
-    synphot.SourceSpectrum(synphot.BlackBody1D, temperature=TT)
-    * np.pi * (rr / DL).to(u.dimensionless_unscaled)**2
-    for TT, rr in zip(T, r)]
-
 def black_body_func(temp,nu):
     hnu=c.h*nu
-    kT=temp*c.k
-    val=2/c.c**2*nu**2*hnu/np.expm1(hnu/kT)
+    kT=temp*c.k_B
+    val=2/c.c**2*nu**2*hnu/np.expm1((hnu/kT).to(u.dimensionless_unscaled))
     return val
 
-class KilonovaModel(TDAMMModel):
+class KilonovaHeatingRateModel(TDAMMModel):
 
     def __init__(self, mass, velocities, opacities, n, distance, z):
-        'Kilonova heating model
+        '''
+        Kilonova heating rate model
+
         args:
           velocities : :class:`astropy.units.Quantity`
             Array of ejecta velocities in units compatible with `cm/s`.
@@ -50,7 +35,13 @@ class KilonovaModel(TDAMMModel):
           z: float
             redshift
         
-        Ref
+        Ref:
+        https://github.com/Basdorsman/kilonova-heating-rate
+
+        If you use this work to produce a peer-reviewed journal article, please cite the following papers:
+
+        Korobkin, O., Rosswog, S., Arcones, A., & Winteler, C. 2012, "On the astrophysical robustness of the neutron star merger r-process," Monthly Notices of the Royal Astronomical Society, 426, 1940. https://doi.org/10.1111/j.1365-2966.2012.21859.x
+        Hotokezaka, K. & Nakar, E. 2020, "Radioactive Heating Rate of r-process Elements and Macronova Light Curve," Astrophysical Journal, 891, 152. https://doi.org/10.3847/1538-4357/ab6a98
         '''
         self.zp1=z+1
         self.distance=distance
@@ -58,6 +49,9 @@ class KilonovaModel(TDAMMModel):
         self.velocities=velocities
         self.opacities=opacities
         self.n=n
+        #print('len(v), len(o):',len(velocities),len(opacities))
+        #print('velocities',velocities)
+        #print('opacities',opacities)
 
 
     def TFgrids(self, times, freqs):
@@ -72,29 +66,40 @@ class KilonovaModel(TDAMMModel):
         
     def fluxDensity(self, times, freqs, *args, **kwargs):
         '''
-        Times, freqs assumed taken in observer frame. The challenge is whether        
+        Times, freqs assumed taken in observer frame. The challenge is whether. 
+        Any times < 0.02 day are ignored.
         
         '''
-        
-        nus=freqs*zp1
-
+        times=np.atleast_1d(times)
         tf = self.TFgrids(times,freqs)
         if tf is None:            
             # Evaluate flux in band at 100 Mpc for a few different filters.
             ts=times/self.zp1
+            #keep=ts>0.02*u.d
+            #ts=ts[keep]
             nus=freqs*self.zp1
-            (L, T, r) = lightcurve(ts, self.mass,self.velocities, self.opacities, self.n)            
-            seds=[ black_body_func(TT,nu) * np.pi * self.zp1 (rr / self.distance).to(u.dimensionless_unscaled)**2
-                   for TT, rr, nu in zip(T, r, nus) ]
-            return np.array(seds)
+            if len(nus.shape)>0:nus=nus[keep]
+            else: nus=nus*np.ones(len(ts))
+            #print('ts',ts)
+            #print('nus',nus)
+            (L, T, r) = lightcurve(ts, self.mass, self.velocities, self.opacities, self.n)
+            sedunits=u.erg/u.cm**2
+            seds=[ (
+                    ( black_body_func(TT,nu) * np.pi * self.zp1* (rr / self.distance)**2 ) /sedunits
+                   ).to(u.dimensionless_unscaled)
+                for TT, rr, nu in zip(T, r, nus) ]
+            seds= np.asarray(seds)*sedunits
+            
         else:
             ts=times[0]/self.zp1
+            #keep=ts>0.02*u.d
+            #ts=ts[keep]
             nus=freqs[0]*self.zp1
-            (L, T, r) = lightcurve(ts, self.mass,self.velocities, self.opacities, self.n)            
-            seds=[ black_body_func(TT,nus) * np.pi * self.zp1 (rr / self.distance).to(u.dimensionless_unscaled)**2
+            (L, T, r) = lightcurve(ts, self.mass, self.velocities, self.opacities, self.n)            
+            seds=[ black_body_func(TT,nus) * np.pi * self.zp1 * (rr / self.distance).to(u.dimensionless_unscaled)**2
                    for TT, rr in zip(T, r) ]
-            return np.array(seds)[None]
-
+            seds=np.array(seds)[None]
+        return seds
     
 
     
