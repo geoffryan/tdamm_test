@@ -18,8 +18,8 @@ afterglow_model = tdamm.AfterglowModel()
 kn_model1 = tdamm.KN_W21("S", 1, 0.03, 0.15, 0.03, 0.15)
 kn_model2 = tdamm.KilonovaHeatingRateModel(mass, velocities, opacities, n,
                                            d_L, z)
-kn_model3 = tdamm.KilonovaHeatingRateModel2(mass, velocities, opacities, n,
-                                           d_L, z)
+kn_model3 = tdamm.KilonovaHeatingRateModel2(mass, velocities, opacities, n)
+
 # Initialize a figure
 fig, ax = plt.subplots(1, 2, figsize=(12, 4))
 
@@ -34,7 +34,7 @@ F_afterglow = afterglow_model.fluxDensity(t, nu,
 F_kn1 = kn_model1.fluxDensity(t, nu, thetaObs=thetaObs, z=z, d_L=d_L)
 
 F_kn2 = kn_model2.fluxDensity(t, nu)
-F_kn3 = kn_model3.fluxDensity(t, nu)
+F_kn3 = kn_model3.fluxDensity(t, nu, z=z, d_L=d_L)
 
 # Plot'em
 ax[0].plot(t, F_afterglow.cgs, label=r'afterglow $\nu = 10^{14}$ Hz')
@@ -57,7 +57,7 @@ F_afterglow = afterglow_model.fluxDensity(t[:, None], nu[None, :],
 F_kn1 = kn_model1.fluxDensity(t[:, None], nu[None, :], 
                             thetaObs=thetaObs, z=z, d_L=d_L)
 F_kn2 = kn_model2.fluxDensity(t[:, None], nu[None, :])
-F_kn3 = kn_model3.fluxDensity(t[:, None], nu[None, :])
+F_kn3 = kn_model3.fluxDensity(t[:, None], nu[None, :], z=z, d_L=d_L)
 
 # Plot'em again
 
