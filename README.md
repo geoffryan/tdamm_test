@@ -4,4 +4,4 @@ An experiment to implement a common interface to a variety of theoretical models
 
 **Considerations**
 
-An electromagnetic emission model is a procedure for computing the spectral flux density $F<sub>ν<\sub>$.
+An electromagnetic emission model is a procedure for computing the spectral flux density $F_ν$.
