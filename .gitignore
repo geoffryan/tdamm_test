@@ -1,4 +1,6 @@
 *.h5
+*.png
+*.pdf
 
 *.swp
 *.egg-info

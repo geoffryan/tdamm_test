@@ -15,7 +15,7 @@ n = 4.5
 
 # Initialize the model objects
 afterglow_model = tdamm.AfterglowModel()
-#kn_model1 = tdamm.KN_W21("S", 1, 0.03, 0.15, 0.03, 0.15)
+kn_model1 = tdamm.KN_W21("S", 1, 0.03, 0.15, 0.03, 0.15)
 kn_model2 = tdamm.KilonovaHeatingRateModel(mass, velocities, opacities, n,
                                            d_L, z)
 # Initialize a figure
@@ -29,14 +29,14 @@ nu = 1.0e14 * u.Hz
 F_afterglow = afterglow_model.fluxDensity(t, nu, 
                                           thetaObs=thetaObs, z=z, d_L=d_L)
 
-#F_kn1 = kn_model1.fluxDensity(t, nu, thetaObs=thetaObs, z=z, d_L=d_L)
+F_kn1 = kn_model1.fluxDensity(t, nu, thetaObs=thetaObs, z=z, d_L=d_L)
 
 F_kn2 = kn_model2.fluxDensity(t, nu)
 
 # Plot'em
 ax[0].plot(t, F_afterglow.cgs, label=r'afterglow $\nu = 10^{14}$ Hz')
-#ax[0].plot(t, F_kn1.cgs, label=r'W21 kilonova $\nu = 10^{14}$ Hz')
-#ax[0].plot(t, (F_kn1 + F_afterglow).cgs, label='combined')
+ax[0].plot(t, F_kn1.cgs, label=r'W21 kilonova $\nu = 10^{14}$ Hz')
+ax[0].plot(t, (F_kn1 + F_afterglow).cgs, label='combined')
 ax[0].plot(t, F_kn2.cgs, ls='--', label=r'heating kilonova $\nu = 10^{14}$ Hz')
 ax[0].plot(t, (F_kn2 + F_afterglow).cgs, ls='--', label='combined 2')
 
@@ -49,16 +49,16 @@ nu = np.geomspace(1.0e8, 1.0e20, 200) * u.Hz
 # New fluxes
 F_afterglow = afterglow_model.fluxDensity(t[:, None], nu[None, :],
                             thetaObs=thetaObs, z=z, d_L=d_L)
-#F_kn1 = kn_model1.fluxDensity(t[:, None], nu[None, :], 
-#                            thetaObs=thetaObs, z=z, d_L=d_L)
+F_kn1 = kn_model1.fluxDensity(t[:, None], nu[None, :], 
+                            thetaObs=thetaObs, z=z, d_L=d_L)
 F_kn2 = kn_model2.fluxDensity(t[:, None], nu[None, :])
 
 # Plot'em again
 
-#ax[1].plot(nu, (F_kn1 + F_afterglow)[0].cgs, label=r'$t$ = 1 d')
-#ax[1].plot(nu, (F_kn1 + F_afterglow)[1].cgs, label=r'$t$ = 10 d')
-#ax[1].plot(nu, (F_kn1 + F_afterglow)[2].cgs, label=r'$t$ = 100 d')
-#ax[1].plot(nu, (F_kn1 + F_afterglow)[3].cgs, label=r'$t$ = 1000 d')
+ax[1].plot(nu, (F_kn1 + F_afterglow)[0].cgs, label=r'$t$ = 1 d')
+ax[1].plot(nu, (F_kn1 + F_afterglow)[1].cgs, label=r'$t$ = 10 d')
+ax[1].plot(nu, (F_kn1 + F_afterglow)[2].cgs, label=r'$t$ = 100 d')
+ax[1].plot(nu, (F_kn1 + F_afterglow)[3].cgs, label=r'$t$ = 1000 d')
 ax[1].plot(nu, (F_kn2 + F_afterglow)[0].cgs, ls='--', color='C0')
 ax[1].plot(nu, (F_kn2 + F_afterglow)[1].cgs, ls='--', color='C1')
 ax[1].plot(nu, (F_kn2 + F_afterglow)[2].cgs, ls='--', color='C2')
@@ -68,9 +68,11 @@ ax[0].legend()
 ax[1].legend()
 
 ax[0].set(xscale='log', yscale='log', xlabel=r'$t$ (days)',
-        ylabel=r'$F_\nu$ (erg s$^{-1}$ cm$^{-2}$ Hz$^{-1}$)')
+        ylabel=r'$F_\nu$ (erg s$^{-1}$ cm$^{-2}$ Hz$^{-1}$)',
+        ylim=(1e-36, 1e-28))
 ax[1].set(xscale='log', yscale='log', xlabel=r'$\nu$ (Hz)',
-        ylabel=r'$F_\nu$ (erg s$^{-1}$ cm$^{-2}$ Hz$^{-1}$)')
+        ylabel=r'$F_\nu$ (erg s$^{-1}$ cm$^{-2}$ Hz$^{-1}$)',
+        ylim=(1e-36, 1e-28))
 
-
+fig.savefig("demo_fig.png")
 plt.show()
