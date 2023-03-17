@@ -1,4 +1,6 @@
 from .tdamm_core import TDAMMModel, ModelParameter
+import numpy as np
+from astropy import units as u
 import afterglowpy as grb
 
 class AfterglowModel(TDAMMModel):
@@ -18,12 +20,14 @@ class AfterglowModel(TDAMMModel):
 
         pars = self.parseArgs(**kwargs)
 
+        tobs, nuobs = np.broadcast_arrays(t.to_value('s'), nu.to_value('Hz'))
+
         Z = dict(jetType=grb.jet.Gaussian, specType=0,
-                 E0=1.0e53, n0=1.0e-3, thetaCore=0.06, thetaWing=0.4,
-                 p=2.2, epsilon_e=0.1, epsilon_B=1.0e-3, xi_N=1.0e-2,
+                 E0=3.0e53, n0=1.0e-3, thetaCore=0.06, thetaWing=0.4,
+                 p=2.2, epsilon_e=0.1, epsilon_B=1.0e-4, xi_N=1.0e-2,
                  thetaObs=pars['thetaObs'].to_value("rad"), 
                  z=pars['z'],
                  d_L=pars['d_L'].to_value('cm'))
 
-        return grb.fluxDensity(t.to_value('s'), nu.to_value('Hz'),
-                               **Z)
+        return (grb.fluxDensity(tobs, nuobs, **Z) * u.mJy
+                ).to('erg / (s cm^2 Hz)')
